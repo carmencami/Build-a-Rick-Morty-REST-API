@@ -8,7 +8,10 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Characters, Location
+
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
 #from models import Person
 
 app = Flask(__name__)
@@ -32,14 +35,54 @@ def sitemap():
 
 @app.route('/user', methods=['GET'])
 def handle_hello():
+    userDb = User.query.all()
+    userlist = list(map(lambda obj : obj.serialize(),userDb))
+    print(userlist)
 
     response_body = {
-        "msg": "Hello, this is your GET /user response "
+        "success" : True,
+        "result": "userlist"
     }
 
     return jsonify(response_body), 200
+
+@app.route('/user', methods=['POST'])
+def add_User():
+
+    body = json.loads(request.data)
+
+    newUser = User(email = body["email"], password = body ["password"], is_active = True)
+    db.session.add(newUser)
+    db.session.commit()
+    print(body)
+    response_body = {
+        "succes" : True,
+        "result": "Creado"
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/character', methods=['PUT'])
+def character_user():
+
+    body = json.loads(request.data)
+
+    newUser = User(email = body["email"], password = body ["password"], is_active = True)
+    db.session.add(newUser)
+    db.session.commit()
+    print(body)
+    response_body = {
+        "succes" : True,
+        "result": "Creado"
+    }
+
+    return jsonify(response_body), 200
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)
+
+
+
