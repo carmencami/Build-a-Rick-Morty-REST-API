@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Characters, Location
+from models import db, User, Characters, Location, Favorites
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
@@ -74,6 +74,82 @@ def character_user():
     response_body = {
         "succes" : True,
         "result": "Creado"
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/characters', methods=['GET'])
+def characters():
+    characters=Characters.query.all()
+    all_characters= list(map(lambda characters : characters.serialize(),characters))
+    return jsonify(all_characters)
+
+@app.route('/character/<int:id>', methods=['GET'])
+def character(id):
+    character=Characters.query.get(id)
+    return jsonify(character.serialize())
+
+@app.route('/location', methods=['GET'])
+def locations():
+    location=Location.query.all()
+    all_location= list(map(lambda location : location.serialize(),location))
+    return jsonify(all_location)
+
+@app.route('/location/<int:id>', methods=['GET'])
+def location(id):
+    location=Location.query.get(id)
+    return jsonify(location.serialize())
+
+@app.route('/favorites/user/<int:user_id>/characters/<int:characters_id>', methods=['POST'])
+def add_favorites_characters(user_id,characters_id):
+
+    newFavorite = Favorites(user_id= user_id, characters_id = characters_id)
+    db.session.add(newFavorite)
+    db.session.commit()
+    response_body = {
+        "succes" : True,
+        "result": "Creado", 
+        "favorites":newFavorite.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/favorites/user/<int:user_id>/location/<int:location_id>', methods=['POST'])
+def add_favorites_locations(user_id,location_id):
+
+    newFavorite = Favorites(user_id= user_id, location_id = location_id)
+    db.session.add(newFavorite)
+    db.session.commit()
+    response_body = {
+        "succes" : True,
+        "result": "Creado", 
+        "favorites":newFavorite.serialize()
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/favorites/user/<int:user_id>/location/<int:location_id>', methods=['DELETE'])
+def delete_favorites_locations(user_id,location_id):
+    favorites=Favorites.query.filter_by(user_id=user_id).filter_by(location_id=location_id).first()
+
+    db.session.delete(favorites)
+    db.session.commit()
+    response_body = {
+        "succes" : True,
+        "result": "Borrado", 
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/favorites/user/<int:user_id>/characters/<int:characters_id>', methods=['DELETE'])
+def delete_favorites_characters(user_id,characters_id):
+    favorites=Favorites.query.filter_by(user_id=user_id).filter_by(characters_id=characters_id).first()
+
+    db.session.delete(favorites)
+    db.session.commit()
+    response_body = {
+        "succes" : True,
+        "result": "Borrado", 
     }
 
     return jsonify(response_body), 200

@@ -40,7 +40,7 @@ class Characters(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     status = db.Column(db.String(80), unique=False, nullable=False)
     especies = db.Column(db.Boolean(), unique=False, nullable=False)
-    type = db.Column(db.String(120), unique=True, nullable=False)
+    type_ = db.Column(db.String(120), unique=True, nullable=False)
     gender = db.Column(db.String(80), unique=False, nullable=False)
     origin = db.Column(db.String(80), unique=False, nullable=False)
     location = db.Column(db.String(80), unique=False, nullable=False)
@@ -57,7 +57,7 @@ class Characters(db.Model):
             "name": self.name,
             "status":self.status,
             "especies":self.especies,
-            "type":self.type,
+            "type_":self.type_,
             "gender":self.gender,
             "origin":self.origin,
             "location":self.location,
@@ -72,7 +72,7 @@ class Characters(db.Model):
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
-    type = db.Column(db.String(120), unique=True, nullable=False)
+    type_ = db.Column(db.String(120), unique=True, nullable=False)
     dimension = db.Column(db.String(80), unique=False, nullable=False)
     residents = db.Column(db.String(80), unique=False, nullable=False)
     url = db.Column(db.String(120), unique=True, nullable=False)
@@ -87,7 +87,7 @@ class Location(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "type":self.type,
+            "type_":self.type_,
             "dimension":self.dimension,
             "residents":self.residents,
             "url":self.url,
@@ -99,8 +99,8 @@ class Location(db.Model):
 class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"),nullable=False)
-    characters_id = db.Column(db.Integer, db.ForeignKey("characters.id"),nullable=False)
-    location_id = db.Column(db.Integer,db.ForeignKey("location.id"),nullable=False)
+    characters_id = db.Column(db.Integer, db.ForeignKey("characters.id"))
+    location_id = db.Column(db.Integer,db.ForeignKey("location.id"))
    
 
 
@@ -111,8 +111,8 @@ class Favorites(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "Characters_id":self.Characters_id,
-            "Planets_id":self.Planets_id
+            "Characters_id":self.characters_id,
+            "Location_id":self.location_id
         
             # do not serialize the password, its a security breach
         }
